@@ -1,0 +1,87 @@
+/*
+  elm-hot creates an additional div wrapper around the app to make HMR possible.
+  This could break styling in development mode if you are using Elm UI.
+
+  More context in the issue:
+    https://github.com/halfzebra/create-elm-app/issues/320
+*/
+[data-elm-hot="true"] {
+  height: inherit;
+}
+
+body {
+  font-family: 'Source Sans Pro', 'Trebuchet MS', 'Lucida Grande', 'Bitstream Vera Sans', 'Helvetica Neue', sans-serif;
+  margin: 0;
+  text-align: center;
+  color: #293c4b;
+}
+
+.title {
+    font-size: 2.4rem;
+    font-weight: bold;
+    padding: 1.2rem;
+}
+
+.subtitle {
+    font-size: 2rem;
+    font-weight: bold;
+    padding: 1.2rem;
+}
+
+.text {
+    font-size: 1.3rem;
+    padding: 1.2rem;
+}
+
+.page-wrapper {
+    display: grid;
+
+    grid-template-columns: 12% 76% 12%;
+    grid-template-rows: auto;
+}
+
+.page-content {
+    grid-column: 2 / span 1;
+}
+
+.seperator {
+    width: 95%;
+}
+
+.navlink {
+    font-size: 2rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: black;
+}
+
+.selected {
+    background-color: black;
+    color: white;
+    padding: 1rem;
+}
+
+#logo-wrapper {
+    justify-self: start;
+    padding-left: 5%;
+}
+
+#logo {
+    max-width: 80%;
+}
+
+#header {
+    display: grid;
+
+    grid-template-columns: 25% 15% 15% 15% 15% 15%;
+    grid-template-rows: auto auto;
+    padding-top: 1%;
+
+    justify-items: center;
+    align-items: center;
+}
+
+#header-seperator {
+    grid-row: 2 / span 1;
+    grid-column: 1 / span 6;
+}
