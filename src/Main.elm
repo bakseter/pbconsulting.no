@@ -4,7 +4,7 @@ import Browser
 import Browser.Navigation
 import Html exposing (Html, a, div, hr, img, text)
 import Html.Attributes exposing (alt, class, href, id, src)
-import Page
+import Page exposing (Page)
 import Page.About as About
 import Page.Contact as Contact
 import Page.Customers as Customers
@@ -85,6 +85,7 @@ view model =
     }
 
 
+isSelected : Model -> Page -> Html.Attribute msg
 isSelected model page =
     case ( model, page ) of
         ( Home _, Page.Home ) ->
