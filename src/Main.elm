@@ -1,188 +1,253 @@
 module Main exposing (main)
 
 import Browser
+import Browser.Dom
 import Browser.Navigation
 import Html exposing (Html, a, div, hr, img, text)
 import Html.Attributes exposing (alt, class, href, id, src)
-import Page exposing (Page)
+import Html.Events
+import Page exposing (Page(..))
 import Page.About as About
 import Page.Contact as Contact
 import Page.Customers as Customers
 import Page.Home as Home
 import Page.NotFound as NotFound
 import Page.Services as Services
+import Svg
+import Svg.Attributes exposing (x1, x2, y1, y2)
+import Svg.Events
+import Task
+import Time
 import Url
 
 
 type Msg
     = UrlChanged Url.Url
     | UrlRequest Browser.UrlRequest
+    | Tick Time.Posix
+    | GotViewport Browser.Dom.Viewport
+    | GotViewportOfPage (Result Browser.Dom.Error Browser.Dom.Element)
+    | ShowNavbar Bool
+    | NoOp
 
 
-type Model
-    = Home Home.Model
-    | About About.Model
-    | Services Services.Model
-    | Customers Customers.Model
-    | Contact Contact.Model
-    | NotFound NotFound.Model
+type alias Model =
+    { url : Url.Url
+    , key : Browser.Navigation.Key
+    , page : Page
+    , viewport : Browser.Dom.Viewport
+    , showNavbar : Bool
+    , error : Maybe Browser.Dom.Error
+    }
 
 
 init : () -> Url.Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
 init _ url key =
-    changeRouteTo url key
+    let
+        page =
+            Page.fromUrl url
+    in
+    ( { url = url
+      , key = key
+      , page = page
+      , viewport = emptyViewport
+      , showNavbar = False
+      , error = Nothing
+      }
+    , viewportOfPage page
+    )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
+    Time.every 10 Tick
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         UrlChanged url ->
-            changeRouteTo url (toKey model)
+            let
+                page =
+                    Page.fromUrl url
+            in
+            ( { model | page = page }, viewportOfPage page )
 
         UrlRequest request ->
             case request of
                 Browser.Internal url ->
-                    ( model, Browser.Navigation.pushUrl (toKey model) (Url.toString url) )
+                    ( model, Browser.Navigation.pushUrl model.key (Url.toString url) )
 
                 Browser.External href ->
                     ( model, Browser.Navigation.load href )
+
+        Tick _ ->
+            ( model, Task.perform GotViewport Browser.Dom.getViewport )
+
+        GotViewport viewport ->
+            if model.viewport.viewport.y < viewport.viewport.y then
+                ( { model | viewport = viewport, showNavbar = False }, Cmd.none )
+
+            else
+                ( { model | viewport = viewport }, Cmd.none )
+
+        GotViewportOfPage result ->
+            case result of
+                Ok element ->
+                    ( { model | viewport = { viewport = element.viewport, scene = element.scene } }
+                    , Task.perform (\_ -> NoOp) (Browser.Dom.setViewport 0 element.element.y)
+                    )
+
+                Err error ->
+                    ( { model | error = Just error }, Cmd.none )
+
+        ShowNavbar showNavbar ->
+            ( { model | showNavbar = showNavbar }, Cmd.none )
+
+        NoOp ->
+            ( model, Cmd.none )
 
 
 view : Model -> Browser.Document Msg
 view model =
     let
-        ( title, body ) =
-            case model of
-                Home _ ->
-                    ( Home.title, Home.view )
+        title =
+            case model.page of
+                Home ->
+                    Home.title
 
-                About _ ->
-                    ( About.title, About.view )
+                About ->
+                    About.title
 
-                Services _ ->
-                    ( Services.title, Services.view )
+                Services ->
+                    Services.title
 
-                Customers _ ->
-                    ( Customers.title, Customers.view )
+                Customers ->
+                    Customers.title
 
-                Contact _ ->
-                    ( Contact.title, Contact.view )
+                Contact ->
+                    Contact.title
 
-                NotFound _ ->
-                    ( NotFound.title, NotFound.view )
+                NotFound ->
+                    NotFound.title
     in
     { title = title
     , body =
-        [ header model
-        , body
-        , footer model
-        ]
+        case model.page of
+            NotFound ->
+                [ header model.showNavbar
+                , NotFound.view
+                , footer model
+                ]
+
+            _ ->
+                [ header model.showNavbar
+                , Home.view
+                , About.view
+                , Services.view
+                , Customers.view
+                , Contact.view
+                , footer model
+                ]
     }
 
 
-isSelected : Model -> Page -> Html.Attribute msg
-isSelected model page =
-    case ( model, page ) of
-        ( Home _, Page.Home ) ->
-            class "selected"
+header : Bool -> Html Msg
+header showNavbar =
+    let
+        navbarId =
+            if showNavbar then
+                "navbar"
 
-        ( About _, Page.About ) ->
-            class "selected"
-
-        ( Services _, Page.Services ) ->
-            class "selected"
-
-        ( Customers _, Page.Customers ) ->
-            class "selected"
-
-        ( Contact _, Page.Contact ) ->
-            class "selected"
-
-        _ ->
-            class ""
-
-
-header : Model -> Html msg
-header model =
+            else
+                "navbar-hidden"
+    in
     div [ id "header" ]
-        [ a [ id "logo-wrapper", href <| "/" ] [ img [ id "logo", src "img/logo.png", alt "Logo" ] [] ]
-        , a [ class "navlink", isSelected model Page.Home, href <| "/" ] [ text "HOME" ]
-        , a [ class "navlink", isSelected model Page.About, href <| "/" ++ About.route ] [ text "ABOUT" ]
-        , a [ class "navlink", isSelected model Page.Services, href <| "/" ++ Services.route ] [ text "SERVICES" ]
-        , a [ class "navlink", isSelected model Page.Customers, href <| "/" ++ Customers.route ] [ text "CUSTOMERS" ]
-        , a [ class "navlink", isSelected model Page.Contact, href <| "/" ++ Contact.route ] [ text "CONTACT" ]
-        , hr [ class "seperator", id "header-seperator" ] []
+        [ a [ id "logo-wrapper", href <| "/", Html.Events.onClick (ShowNavbar False) ] [ img [ id "logo", src "img/logo-white.png", alt "Logo" ] [] ]
+        , div [ id navbarId ]
+            [ a [ class "navlink", href <| "/" ++ About.route, Html.Events.onClick (ShowNavbar False) ] [ text "ABOUT" ]
+            , a [ class "navlink", href <| "/" ++ Services.route, Html.Events.onClick (ShowNavbar False) ] [ text "SERVICES" ]
+            , a [ class "navlink", href <| "/" ++ Customers.route, Html.Events.onClick (ShowNavbar False) ] [ text "CUSTOMERS" ]
+            , a [ class "navlink", href <| "/" ++ Contact.route, Html.Events.onClick (ShowNavbar False) ] [ text "CONTACT" ]
+            , hr [ id "navbar-separator" ] []
+            ]
+        , navbtn showNavbar
+        ]
+
+
+navbtn : Bool -> Html Msg
+navbtn showNavbar =
+    let
+        transitionId =
+            if showNavbar then
+                "-transition"
+
+            else
+                ""
+    in
+    div [ id "navbtn" ]
+        [ Svg.svg [ Svg.Attributes.viewBox "0 0 50 50", (Svg.Events.onClick << ShowNavbar << not) showNavbar, Svg.Attributes.width "100%" ]
+            [ Svg.line
+                [ Svg.Attributes.class "navbtn-line", Svg.Attributes.id ("first-line" ++ transitionId), x1 "0", x2 "50", y1 "5", y2 "5" ]
+                []
+            , Svg.line
+                [ Svg.Attributes.class "navbtn-line", Svg.Attributes.id ("middle-line" ++ transitionId), x1 "0", x2 "50", y1 "20", y2 "20" ]
+                []
+            , Svg.line
+                [ Svg.Attributes.class "navbtn-line", Svg.Attributes.id ("second-line" ++ transitionId), x1 "0", x2 "50", y1 "35", y2 "35" ]
+                []
+            ]
         ]
 
 
 footer : Model -> Html msg
 footer _ =
     div [ id "footer" ]
-        [ hr [ class "seperator", id "footer-seperator" ] []
-        , div [ class "text" ]
+        [ div [ class "text" ]
             [ text "PB Consulting AS - Org. nr. 993 765 228 MVA" ]
         ]
 
 
-toKey : Model -> Browser.Navigation.Key
-toKey model =
-    case model of
-        Home home ->
-            Home.toKey home
+viewportOfPage : Page -> Cmd Msg
+viewportOfPage page =
+    let
+        id_ =
+            case page of
+                About ->
+                    "about"
 
-        About about ->
-            About.toKey about
+                Services ->
+                    "services"
 
-        Services services ->
-            Services.toKey services
+                Customers ->
+                    "customers"
 
-        Customers customers ->
-            Customers.toKey customers
+                Contact ->
+                    "contact"
 
-        Contact contact ->
-            Contact.toKey contact
+                _ ->
+                    ""
+    in
+    if page == Home then
+        Task.perform (\_ -> NoOp) (Browser.Dom.setViewport 0 0)
 
-        NotFound notFound ->
-            NotFound.toKey notFound
+    else
+        Task.attempt GotViewportOfPage (Browser.Dom.getElement id_)
 
 
-changeRouteTo : Url.Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
-changeRouteTo url key =
-    case Page.fromUrl url of
-        Page.Home ->
-            ( Home (Home.init key)
-            , Cmd.none
-            )
-
-        Page.About ->
-            ( About (About.init key)
-            , Cmd.none
-            )
-
-        Page.Services ->
-            ( Services (Services.init key)
-            , Cmd.none
-            )
-
-        Page.Customers ->
-            ( Customers (Customers.init key)
-            , Cmd.none
-            )
-
-        Page.Contact ->
-            ( Contact (Contact.init key)
-            , Cmd.none
-            )
-
-        Page.NotFound ->
-            ( NotFound (NotFound.init key)
-            , Cmd.none
-            )
+emptyViewport : Browser.Dom.Viewport
+emptyViewport =
+    { scene =
+        { width = 0
+        , height = 0
+        }
+    , viewport =
+        { x = 0
+        , y = 0
+        , width = 0
+        , height = 0
+        }
+    }
 
 
 main : Program () Model Msg

@@ -1,69 +1,95 @@
-/*
-  elm-hot creates an additional div wrapper around the app to make HMR possible.
-  This could break styling in development mode if you are using Elm UI.
-
-  More context in the issue:
-    https://github.com/halfzebra/create-elm-app/issues/320
-*/
 [data-elm-hot="true"] {
   height: inherit;
 }
 
 body {
-  font-family: 'Source Sans Pro', 'Trebuchet MS', 'Lucida Grande', 'Bitstream Vera Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'IBM Plex Sans', 'Source Sans Pro', 'Trebuchet MS', 'Lucida Grande', 'Bitstream Vera Sans', 'Helvetica Neue', sans-serif;
   margin: 0;
-  text-align: center;
   color: #293c4b;
+  background-color: black;
+}
+
+.big-title, .title, .subtitle, .text {
+    font-weight: bold;
+    padding: 1.2rem;
+    color: white;
+}
+
+.big-title {
+    font-size: 5rem;
 }
 
 .title {
-    font-size: 2.4rem;
-    font-weight: bold;
-    padding: 1.2rem;
+    font-size: 2.5rem;
 }
 
 .subtitle {
     font-size: 2rem;
-    font-weight: bold;
-    padding: 1.2rem;
 }
 
 .text {
-    font-size: 1.3rem;
-    padding: 1.2rem;
+    font-size: 1.2rem;
 }
 
-.page-wrapper {
+.page-wrapper-left, .page-wrapper-right {
     display: grid;
-
-    grid-template-columns: 12% 76% 12%;
-    grid-template-rows: auto;
+    padding-bottom: 10%;
+    animation: fade-in 1.5s ease;
 }
 
-.page-content {
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.page-wrapper-left {
+    grid-template-columns: 10% 55% 25% 10%;
+}
+
+.page-wrapper-right {
+    grid-template-columns: 10% 25% 55% 10%;
+}
+
+.page-title-left, .page-title-right {
+    justify-self: center;
+    align-self: center;
+}
+
+.page-title-left {
     grid-column: 2 / span 1;
+    grid-row: 1 / span 1;
+}
+.page-title-right {
+    grid-column: 3 / span 1;
+    grid-row: 1 / span 1;
 }
 
-.seperator {
-    width: 95%;
+.page-content-left {
+    grid-column: 2 / span 1;
+    grid-row: 1 / span 1;
+}
+.page-content-right {
+    grid-column: 3 / span 1;
+    grid-row: 1 / span 1;
 }
 
 .navlink {
     font-size: 2rem;
+    outline: none;
     font-weight: bold;
     text-decoration: none;
-    color: black;
+    color: white;
 }
 
 .selected {
-    background-color: black;
     color: white;
     padding: 1rem;
+    border-radius: 0.8rem;
 }
 
 #logo-wrapper {
-    justify-self: start;
     padding-left: 5%;
+    outline: none;
 }
 
 #logo {
@@ -71,17 +97,142 @@ body {
 }
 
 #header {
+    position: sticky;
+    top: 0%;
+
     display: grid;
 
-    grid-template-columns: 25% 15% 15% 15% 15% 15%;
-    grid-template-rows: auto auto;
+    grid-template-columns: 25% 65% 10%;
     padding-top: 1%;
 
     justify-items: center;
     align-items: center;
 }
 
-#header-seperator {
+#navbar, #navbar-hidden {
+    transition: 0.4s ease-out;
+    position: absolute;
+    background-color: black;
+
+    grid-column: 2 / span 1;
+
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25%;
+    grid-template-rows: auto auto;
+    padding-top: 30%;
+
+    width: 100%;
+
+    justify-items: center;
+}
+#navbar {
+    top: -200%;
+}
+#navbar-hidden {
+    top: -300%;
+}
+
+
+#navbar-separator {
     grid-row: 2 / span 1;
-    grid-column: 1 / span 6;
+    grid-column: 1 / span 4;
+    width: 100%;
+
+    border: 1px solid white;
+    margin-top: 1%;
+    margin-bottom: 1%;
+}
+
+#first-line-transition {
+    transform: rotate(45deg) translate(12px, -7px) scale(0.8);
+}
+#middle-line-transition {
+    transform: translateX(110%);
+}
+#second-line-transition {
+    transform: rotate(-45deg) translate(-16px, 4px) scale(0.8);
+}
+
+#navbtn {
+    grid-column: 3 / span 1;
+    width: 50%;
+    padding-left: 5%;
+    cursor: pointer;
+}
+
+.navbtn-line {
+    transition: 0.4s ease;
+    stroke: white;
+    stroke-width: 4;
+}
+
+#footer {
+    text-align: center;
+    position: sticky;
+    bottom: 0%;
+
+    font-weight: bold;
+}
+
+.blob {
+    position: absolute;
+    width: 30%;
+    z-index: -1;
+}
+
+.side-img {
+    border-radius: 0.8rem;
+}
+
+#per {
+    max-width: 300px;
+}
+
+
+#contact {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: auto;
+
+    justify-items: center;
+    align-items: center;
+}
+
+#contact-info {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-template-rows: auto auto;
+}
+
+#contact-header {
+    grid-row: 1 / span;
+    grid-column: 2 / span 2;
+}
+
+#address, #email, #mobile {
+    grid-row: 2 / span 1;
+}
+
+#address {
+    grid-column: 1 / span 1;
+}
+#email {
+    grid-column: 2 / span 1;
+}
+#mobile {
+    grid-column: 3 / span 1;
+}
+
+
+#map {
+    border-radius: 0.8rem;
+}
+
+#not-found {
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: auto auto;
+    justify-items: center;
+    align-items: center;
+    padding: 10%;
 }

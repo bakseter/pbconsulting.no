@@ -1,8 +1,8 @@
-module Page.Services exposing (Model, init, route, title, toKey, view)
+module Page.Services exposing (route, title, view)
 
-import Browser.Navigation
-import Html exposing (Html, div, li, text, ul)
+import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, id)
+import Utils exposing (unorderedList)
 
 
 route : String
@@ -15,24 +15,15 @@ title =
     "Services"
 
 
-type alias Model =
-    { key : Browser.Navigation.Key }
-
-
-init : Browser.Navigation.Key -> Model
-init key =
-    Model key
-
-
 view : Html msg
 view =
-    div [ class "page-wrapper", id "services" ]
-        [ div [ class "page-content" ]
-            [ div [ class "title" ]
-                [ text "Services" ]
-            , div [ class "subtitle" ]
-                [ text "Key Professional Qualifications and Skills" ]
-            , unorderedList
+    div [ class "page-wrapper-right", id "services" ]
+        [ div [ class "page-title-left" ]
+            [ div [ class "title" ] [ text "Services" ]
+            , div [ class "subtitle" ] [ text "Key Professional Qualifications and Skills" ]
+            ]
+        , div [ class "page-content-right" ]
+            [ unorderedList
                 [ """
                     Board Member: Chairman or board member for start-ups and fast growing companies, especially high tech companies.
                     Experience from board positions in Norway, Sweden, Denmark, Finland, UK, Ireland, Germany, USA, Singapore and Malaysia.
@@ -67,13 +58,3 @@ view =
                 ]
             ]
         ]
-
-
-unorderedList : List String -> Html msg
-unorderedList strings =
-    ul [] (List.map (\x -> li [] [ text x ]) strings)
-
-
-toKey : Model -> Browser.Navigation.Key
-toKey model =
-    model.key

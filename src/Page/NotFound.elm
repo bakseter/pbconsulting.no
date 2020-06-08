@@ -1,7 +1,7 @@
-module Page.NotFound exposing (Model, init, title, toKey, view)
+module Page.NotFound exposing (title, view)
 
-import Browser.Navigation
 import Html exposing (Html, div, text)
+import Html.Attributes exposing (class, id)
 
 
 title : String
@@ -9,20 +9,9 @@ title =
     "404 Not Found"
 
 
-type alias Model =
-    { key : Browser.Navigation.Key }
-
-
-init : Browser.Navigation.Key -> Model
-init key =
-    Model key
-
-
 view : Html msg
 view =
-    div [] [ text "404 not found" ]
-
-
-toKey : Model -> Browser.Navigation.Key
-toKey model =
-    model.key
+    div [ id "not-found" ]
+        [ div [ class "big-title" ] [ text "404" ]
+        , div [ class "subtitle" ] [ text "page not found" ]
+        ]

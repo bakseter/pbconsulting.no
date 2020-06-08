@@ -1,6 +1,5 @@
-module Page.About exposing (Model, init, route, title, toKey, view)
+module Page.About exposing (route, title, view)
 
-import Browser.Navigation
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, id)
 
@@ -15,21 +14,12 @@ title =
     "About"
 
 
-type alias Model =
-    { key : Browser.Navigation.Key }
-
-
-init : Browser.Navigation.Key -> Model
-init =
-    Model
-
-
 view : Html msg
 view =
-    div [ class "page-wrapper", id "about" ]
-        [ div [ class "page-content" ]
-            [ div [ class "title" ]
-                [ text "About" ]
+    div [ class "page-wrapper-left", id "about" ]
+        [ div [ class "page-title-right" ] []
+        , div [ class "page-content-left" ]
+            [ div [ class "title" ] [ text "About us" ]
             , div [ class "text" ]
                 [ text
                     """
@@ -67,8 +57,3 @@ view =
                 ]
             ]
         ]
-
-
-toKey : Model -> Browser.Navigation.Key
-toKey model =
-    model.key
