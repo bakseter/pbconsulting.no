@@ -1,4 +1,4 @@
-module Page.Contact exposing (route, title, view)
+module Page.Contact exposing (Model, Msg, init, route, title, update, view)
 
 import Html exposing (Html, a, div, iframe, text)
 import Html.Attributes exposing (class, height, href, id, src, tabindex, width)
@@ -14,8 +14,21 @@ title =
     "Contact"
 
 
-view : Html msg
-view =
+type Msg
+    = NoOp
+
+
+type alias Model =
+    {}
+
+
+init : Model
+init =
+    {}
+
+
+view : Model -> Html msg
+view _ =
     div [ id "contact" ]
         [ iframe
             [ id "map"
@@ -43,3 +56,8 @@ view =
                 ]
             ]
         ]
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update _ model =
+    ( model, Cmd.none )

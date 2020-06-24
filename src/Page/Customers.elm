@@ -1,8 +1,7 @@
-module Page.Customers exposing (route, title, view)
+module Page.Customers exposing (Model, Msg, init, route, title, update, view)
 
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, id)
-import Utils exposing (unorderedList)
 
 
 route : String
@@ -15,11 +14,25 @@ title =
     "Customers"
 
 
-view : Html msg
-view =
+type Msg
+    = NoOp
+
+
+type alias Model =
+    {}
+
+
+init : Model
+init =
+    {}
+
+
+view : Model -> Html msg
+view _ =
     div [ class "page-wrapper-left", id "customers" ]
         [ div [ class "page-title-right" ]
-            [ div [ class "title" ] [ text "Customers" ] ]
+            [ div [ class "title" ] [ text "Customers" ]
+            ]
         , div [ class "page-content-left" ]
             [ div [ class "subtitle" ] [ text "Examples of Board Positions" ]
 
@@ -51,3 +64,8 @@ view =
             -}
             ]
         ]
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update _ model =
+    ( model, Cmd.none )

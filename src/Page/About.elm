@@ -1,4 +1,4 @@
-module Page.About exposing (route, title, view)
+module Page.About exposing (Model, Msg, init, route, title, update, view)
 
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, id)
@@ -14,13 +14,27 @@ title =
     "About"
 
 
-view : Html msg
-view =
+type Msg
+    = NoOp
+
+
+type alias Model =
+    {}
+
+
+init : Model
+init =
+    {}
+
+
+view : Model -> Html msg
+view _ =
     div [ class "page-wrapper-left", id "about" ]
-        [ div [ class "page-title-right" ] []
-        , div [ class "page-content-left" ]
+        [ div [ class "page-title-right" ]
             [ div [ class "title" ] [ text "About us" ]
-            , div [ class "text" ]
+            ]
+        , div [ class "page-content-left" ]
+            [ div [ class "text" ]
                 [ text
                     """
                     PB Consulting started in 2009, and the main focus was to help small and medium size Norwegian-based companies to suceed internationally.
@@ -57,3 +71,8 @@ view =
                 ]
             ]
         ]
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update _ model =
+    ( model, Cmd.none )

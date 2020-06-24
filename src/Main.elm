@@ -25,6 +25,11 @@ type Msg
     = UrlChanged Url.Url
     | UrlRequest Browser.UrlRequest
     | Tick Time.Posix
+    | GotHomeMsg Home.Msg
+    | GotAboutMsg About.Msg
+    | GotServicesMsg Services.Msg
+    | GotCustomersMsg Customers.Msg
+    | GotContactMsg Contact.Msg
     | GotViewport Browser.Dom.Viewport
     | GotViewportOfPage (Result Browser.Dom.Error Browser.Dom.Element)
     | ShowNavbar Bool
@@ -35,6 +40,11 @@ type alias Model =
     { url : Url.Url
     , key : Browser.Navigation.Key
     , page : Page
+    , home : Home.Model
+    , about : About.Model
+    , services : Services.Model
+    , customers : Customers.Model
+    , contact : Contact.Model
     , viewport : Browser.Dom.Viewport
     , showNavbar : Bool
     , error : Maybe Browser.Dom.Error
@@ -50,6 +60,11 @@ init _ url key =
     ( { url = url
       , key = key
       , page = page
+      , home = Home.init
+      , about = About.init
+      , services = Services.init
+      , customers = Customers.init
+      , contact = Contact.init
       , viewport = emptyViewport
       , showNavbar = False
       , error = Nothing
@@ -80,6 +95,41 @@ update msg model =
 
                 Browser.External href ->
                     ( model, Browser.Navigation.load href )
+
+        GotHomeMsg pageMsg ->
+            let
+                ( newModel, cmds ) =
+                    Home.update pageMsg model.home
+            in
+            ( { model | home = newModel }, Cmd.map GotHomeMsg cmds )
+
+        GotAboutMsg pageMsg ->
+            let
+                ( newModel, cmds ) =
+                    About.update pageMsg model.about
+            in
+            ( { model | about = newModel }, Cmd.map GotAboutMsg cmds )
+
+        GotServicesMsg pageMsg ->
+            let
+                ( newModel, cmds ) =
+                    Services.update pageMsg model.services
+            in
+            ( { model | services = newModel }, Cmd.map GotServicesMsg cmds )
+
+        GotCustomersMsg pageMsg ->
+            let
+                ( newModel, cmds ) =
+                    Customers.update pageMsg model.customers
+            in
+            ( { model | customers = newModel }, Cmd.map GotCustomersMsg cmds )
+
+        GotContactMsg pageMsg ->
+            let
+                ( newModel, cmds ) =
+                    Contact.update pageMsg model.contact
+            in
+            ( { model | contact = newModel }, Cmd.map GotContactMsg cmds )
 
         Tick _ ->
             ( model, Task.perform GotViewport Browser.Dom.getViewport )
@@ -142,11 +192,11 @@ view model =
 
             _ ->
                 [ header model.showNavbar
-                , Home.view
-                , About.view
-                , Services.view
-                , Customers.view
-                , Contact.view
+                , Html.map GotHomeMsg <| Home.view model.home
+                , Html.map GotAboutMsg <| About.view model.about
+                , Html.map GotServicesMsg <| Services.view model.services
+                , Html.map GotCustomersMsg <| Customers.view model.customers
+                , Html.map GotContactMsg <| Contact.view model.contact
                 , footer model
                 ]
     }

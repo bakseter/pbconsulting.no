@@ -20,7 +20,8 @@ body {
 }
 
 .title {
-    font-size: 2.5rem;
+    font-size: 3rem;
+    color: white;
 }
 
 .subtitle {
@@ -51,8 +52,6 @@ body {
 }
 
 .page-title-left, .page-title-right {
-    justify-self: center;
-    align-self: center;
 }
 
 .page-title-left {
@@ -176,18 +175,30 @@ body {
 
 .blob {
     position: absolute;
-    width: 30%;
     z-index: -1;
+    color: white;
+    transform: scale(2.5);
 }
 
-.side-img {
-    border-radius: 0.8rem;
+#home-blob {
+    left: 14%;
+    transform: scale(2.8);
+}
+#about-blob {
+    right: 16%;
+}
+#customers-blob {
+    right: 16%;
+}
+#services-blob {
+    left: 18%;
 }
 
 #per {
-    max-width: 300px;
+    border-radius: 0.8rem;
+    max-width: 80%;
+    margin-top: 28%;
 }
-
 
 #contact {
     display: grid;
@@ -235,4 +246,41 @@ body {
     justify-items: center;
     align-items: center;
     padding: 10%;
+}
+
+#slideshow {
+    position: relative;
+    display: grid;
+    grid-template-columns: 12% 76% 12%;
+    align-items: center;
+    justify-items: center;
+    
+    padding: 5% 0% 5% 0%;
+}
+
+.arrow {
+    background-color: white;
+    border-radius: 50%;
+    padding: 10%;
+    color: black;
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.slide {
+    position: absolute;
+    transition: 1.5s ease;
+    white-space: pre;
+}
+
+#current-slide {
+    opacity: 1;
+}
+
+    
+#services-blob {
+}
+
+#hidden-slide {
+    opacity: 0;
 }

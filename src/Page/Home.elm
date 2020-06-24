@@ -1,4 +1,4 @@
-module Page.Home exposing (title, view)
+module Page.Home exposing (Model, Msg, init, title, update, view)
 
 import Html exposing (Html, div, img, text)
 import Html.Attributes exposing (alt, class, id, src)
@@ -9,11 +9,24 @@ title =
     "Home"
 
 
-view : Html msg
-view =
+type Msg
+    = NoOp
+
+
+type alias Model =
+    {}
+
+
+init : Model
+init =
+    {}
+
+
+view : Model -> Html msg
+view _ =
     div [ class "page-wrapper-right", id "home" ]
         [ div [ class "page-title-left" ]
-            [--img [ class "side-img", id "per", src "/img/per1.jpg", alt "Per Bakseter" ] [] ]
+            [ img [ class "side-img", id "per", src "/img/per1.jpg", alt "Per Bakseter" ] []
             ]
         , div [ class "page-content-right" ]
             [ div [ class "title" ] [ text "Executive Management Consulting" ]
@@ -61,3 +74,8 @@ view =
                 ]
             ]
         ]
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update _ model =
+    ( model, Cmd.none )
